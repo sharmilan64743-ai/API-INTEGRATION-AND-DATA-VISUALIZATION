@@ -1,0 +1,43 @@
+
+
+import requests
+import pandas as pd
+import matplotlib.pyplot as plt
+API_KEY = "YOUR_API_KEY"   
+CITY = "Chennai"           
+URL = f"http://api.openweathermap.org/data/2.5/forecast?q={CITY}&appid={API_KEY}&units=metric"
+response = requests.get(URL)
+data = response.json()
+
+
+forecast_list = data["list"]
+
+
+df = pd.DataFrame([{
+    "datetime": item["dt_txt"],
+    "temperature": item["main"]["temp"],
+    "humidity": item["main"]["humidity"],
+    "weather": item["weather"][0]["description"]
+} for item in forecast_list])
+
+df["datetime"] = pd.to_datetime(df["datetime"])
+
+plt.figure(figsize=(10,5))
+plt.plot(df["datetime"], df["temperature"], marker='o', linestyle='-', label="Temperature (°C)")
+plt.xlabel("Date & Time")
+plt.ylabel("Temperature (°C)")
+plt.title(f"5-Day Temperature Forecast - {CITY}")
+plt.xticks(rotation=45)
+plt.legend()
+plt.tight_layout()
+plt.show()
+
+plt.figure(figsize=(10,5))
+plt.plot(df["datetime"], df["humidity"], color="orange", marker='s', linestyle='-', label="Humidity (%)")
+plt.xlabel("Date & Time")
+plt.ylabel("Humidity (%)")
+plt.title(f"5-Day Humidity Forecast - {CITY}")
+plt.xticks(rotation=45)
+plt.legend()
+plt.tight_layout()
+plt.show()
